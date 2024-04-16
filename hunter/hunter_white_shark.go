@@ -9,20 +9,22 @@ import (
 	"time"
 )
 
+var Seed *rand.Rand
+
 func init() {
-	rand.Seed(time.Now().UnixNano())
+	Seed = rand.New(rand.NewSource(time.Now().UnixNano()))
 }
 
 // CreateWhiteShark creates a new WhiteShark (with default parameters)
 func CreateWhiteShark(simulator simulator.CatchSimulator) (h Hunter) {
 	// default config
 	// -> speed: 144 m/s
-	speed := rand.Float64() * 144.0 + 15.0
+	speed := Seed.Float64()*144.0 + 15.0
 	// -> position: random
 	position := &positioner.Position{
-		X: rand.Float64() * 500,
-		Y: rand.Float64() * 500,
-		Z: rand.Float64() * 500,
+		X: Seed.Float64() * 500,
+		Y: Seed.Float64() * 500,
+		Z: Seed.Float64() * 500,
 	}
 
 	h = &WhiteShark{
@@ -65,7 +67,7 @@ func (w *WhiteShark) Hunt(prey prey.Prey) (err error) {
 		Position: w.position,
 		Speed:    w.speed,
 	}
-	
+
 	// check if shark can catch the prey
 	if !w.simulator.CanCatch(sharkSubject, preySubject) {
 		err = fmt.Errorf("%w: shark can not catch the prey", ErrCanNotHunt)
